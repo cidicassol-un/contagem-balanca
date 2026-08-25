@@ -17,8 +17,31 @@ npm start          # http://localhost:3000
 | GET    | `/quantidadePintinhosBalanca` | inteiro puro, ex: `42`     |
 | GET    | `/api/pintinhos`              | `{"quantidade": 42}`       |
 | GET    | `/health`                     | `{"status":"ok",...}`      |
+| GET    | `/docs`                       | Swagger UI (documentacao)  |
+| GET    | `/openapi.yaml`               | contrato OpenAPI (YAML)    |
+| GET    | `/openapi.json`               | contrato OpenAPI (JSON)    |
 
 A porta pode ser trocada com a variavel de ambiente `PORT`.
+
+## Documentacao (Swagger / OpenAPI)
+
+O contrato fica em [`docs/openapi.yaml`](docs/openapi.yaml) (OpenAPI 3.0.3) e e a
+fonte da verdade da API. Com o servidor rodando, a documentacao interativa fica em:
+
+```
+http://localhost:3000/docs
+```
+
+Na VPS, o mesmo caminho vale para o dominio publicado (ex.: `https://SEU_DOMINIO/docs`).
+Ajuste a secao `servers:` do `openapi.yaml` com o dominio real antes de publicar.
+
+O arquivo tambem pode ser importado direto no Postman, Insomnia ou
+[Swagger Editor](https://editor.swagger.io), ou usado para gerar clientes:
+
+```bash
+npx @redocly/cli lint docs/openapi.yaml     # valida o contrato
+npx @redocly/cli build-docs docs/openapi.yaml -o docs/index.html   # HTML estatico
+```
 
 ## Deploy na VPS Hostinger (Ubuntu)
 

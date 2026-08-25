@@ -1,0 +1,170 @@
+openapi: 3.0.3
+
+info:
+  title: Contagem Pintinhos API
+  version: 1.0.0
+  description: |
+    API de leitura da balanca de pintinhos.
+
+    Retorna a quantidade de pintinhos lida na balanca como um numero inteiro
+    entre 0 e 100 (limites inclusivos).
+
+    > **Atencao:** nesta versao o valor e gerado de forma randomica, apenas
+    > para testes de integracao. A leitura real da balanca ainda nao esta
+    > conectada. Tambem nao ha autenticacao: todos os endpoints sao publicos.
+  contact:
+    name: Projeto Contagem de Pintinhos
+    url: https://github.com/cidicassol-un/contagem-balanca
+  license:
+    name: ISC
+    url: https://opensource.org/licenses/ISC
+
+servers:
+  - url: http://localhost:3000
+    description: Ambiente local de desenvolvimento
+  - url: https://SEU_DOMINIO
+    description: VPS Hostinger (producao)
+
+# Nenhum endpoint exige autenticacao nesta versao.
+security: []
+
+tags:
+  - name: Balanca
+    description: Leitura da quantidade de pintinhos
+  - name: Infraestrutura
+    description: Monitoramento do servico
+
+paths:
+  /quantidadePintinhosBalanca:
+    get:
+      tags: [Balanca]
+      summary: Quantidade de pintinhos (valor puro)
+      description: |
+        Retorna somente o numero inteiro no corpo da resposta, como `text/plain`.
+        Util para clientes simples (CLP, ESP32, shell script) que nao querem
+        interpretar JSON.
+      operationId: quantidadePintinhosBalanca
+      responses:
+        '200':
+          description: Leitura efetuada com sucesso.
+          content:
+            text/plain:
+              schema:
+                type: string
+                pattern: '^(100|[1-9]?[0-9])$'
+                description: Inteiro entre 0 e 100 em formato texto.
+              examples:
+                leitura:
+                  summary: Leitura tipica
+                  value: "42"
+                vazia:
+                  summary: Balanca vazia
+                  value: "0"
+                cheia:
+                  summary: Balanca no limite da faixa
+                  value: "100"
+
+        '404':
+          description: |
+            Rota nao encontrada. Devolvido pelo handler catch-all da API para
+            qualquer caminho nao mapeado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+              example:
+                erro: rota nao encontrada
+
+  /api/pintinhos:
+    get:
+      tags: [Balanca]
+      summary: Quantidade de pintinhos (JSON)
+      description: Mesma leitura do endpoint acima, em formato JSON estruturado.
+      operationId: getQuantidadePintinhosJson
+      responses:
+        '200':
+          description: Leitura efetuada com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeituraBalanca'
+              example:
+                quantidade: 42
+        '404':
+          description: |
+            Rota nao encontrada. Devolvido pelo handler catch-all da API para
+            qualquer caminho nao mapeado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+              example:
+                erro: rota nao encontrada
+
+  /health:
+    get:
+      tags: [Infraestrutura]
+      summary: Healthcheck do servico
+      description: |
+        Verifica se a API esta no ar. Indicado para o monitoramento da VPS
+        e para o healthcheck do pm2 / load balancer.
+      operationId: getHealth
+      responses:
+        '200':
+          description: Servico operacional.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Health'
+              example:
+                status: ok
+                uptime: 3600
+        '404':
+          description: |
+            Rota nao encontrada. Devolvido pelo handler catch-all da API para
+            qualquer caminho nao mapeado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+              example:
+                erro: rota nao encontrada
+
+components:
+  schemas:
+    LeituraBalanca:
+      type: object
+      required: [quantidade]
+      properties:
+        quantidade:
+          type: integer
+          format: int32
+          minimum: 0
+          maximum: 100
+          description: Quantidade de pintinhos lida na balanca.
+          example: 42
+
+    Health:
+      type: object
+      required: [status, uptime]
+      properties:
+        status:
+          type: string
+          enum: [ok]
+          description: Estado do servico.
+        uptime:
+          type: integer
+          format: int32
+          minimum: 0
+          description: Segundos desde a inicializacao do processo.
+          example: 3600
+
+    Erro:
+      type: object
+      required: [erro]
+      properties:
+        erro:
+          type: string
+          description: Mensagem descrevendo a falha.
+          example: rota nao encontrada
+
