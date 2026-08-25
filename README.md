@@ -43,6 +43,11 @@ npx @redocly/cli lint docs/openapi.yaml     # valida o contrato
 npx @redocly/cli build-docs docs/openapi.yaml -o docs/index.html   # HTML estatico
 ```
 
+## Consumo pela IHM
+
+Passo a passo detalhado para ler a API na IHM Weintek cMT2078X (JS Object):
+[`docs/GUIA-IHM-CMT2078X.md`](docs/GUIA-IHM-CMT2078X.md).
+
 ## Proxy reverso nesta VPS
 
 A VPS ja tem um nginx em container (`dental_nginx`, stack `/opt/dentalcompara`)
