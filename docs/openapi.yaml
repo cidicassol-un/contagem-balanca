@@ -20,10 +20,10 @@ info:
     url: https://opensource.org/licenses/ISC
 
 servers:
+  - url: https://icassol.tech
+    description: VPS Hostinger (producao)
   - url: http://localhost:3000
     description: Ambiente local de desenvolvimento
-  - url: https://SEU_DOMINIO
-    description: VPS Hostinger (producao)
 
 # Nenhum endpoint exige autenticacao nesta versao.
 security: []
