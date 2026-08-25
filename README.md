@@ -43,7 +43,33 @@ npx @redocly/cli lint docs/openapi.yaml     # valida o contrato
 npx @redocly/cli build-docs docs/openapi.yaml -o docs/index.html   # HTML estatico
 ```
 
-## Deploy na VPS Hostinger (Ubuntu)
+## Proxy reverso nesta VPS
+
+A VPS ja tem um nginx em container (`dental_nginx`, stack `/opt/dentalcompara`)
+ocupando as portas 80/443. A API entra como mais um virtual host dentro dele,
+em vez de um segundo nginx no host. Os blocos prontos estao em `deploy/`:
+
+- `deploy/nginx-api-http.conf` - etapa 1, so HTTP (permite emitir o certificado)
+- `deploy/nginx-api-https.conf` - etapa 2, HTTP redirecionando para HTTPS
+
+O arquivo `/opt/dentalcompara/nginx/nginx.conf` e montado no container. O
+procedimento e sempre partir do backup limpo e anexar o vhost desejado, o que
+torna a operacao repetivel:
+
+```bash
+BASE=/opt/dentalcompara/nginx/nginx.conf
+RAW=https://raw.githubusercontent.com/cidicassol-un/contagem-balanca/main/deploy
+
+cp $BASE.bak $BASE
+curl -fsSL $RAW/nginx-api-https.conf >> $BASE
+docker exec dental_nginx nginx -t && docker exec dental_nginx nginx -s reload
+```
+
+O upstream aponta para `172.18.0.1:3000`, gateway da rede
+`dentalcompara_internal` - e assim que o container alcanca a aplicacao no host.
+Por isso o `HOST` da aplicacao e `0.0.0.0`, com a porta 3000 fechada no ufw.
+
+## Deploy standalone (nginx direto no host)
 
 ```bash
 # 1. Node LTS
