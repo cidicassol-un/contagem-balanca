@@ -32,7 +32,7 @@ fonte da verdade da API. Com o servidor rodando, a documentacao interativa fica 
 http://localhost:3000/docs
 ```
 
-Na VPS, o mesmo caminho vale para o dominio publicado (ex.: `https://icassol.tech/docs`).
+Na VPS, o mesmo caminho vale para o dominio publicado (ex.: `https://api.icassol.tech/docs`).
 Ajuste a secao `servers:` do `openapi.yaml` com o dominio real antes de publicar.
 
 O arquivo tambem pode ser importado direto no Postman, Insomnia ou
@@ -68,7 +68,7 @@ pm2 startup            # execute o comando que ele imprimir
 ```nginx
 server {
     listen 80;
-    server_name icassol.tech www.icassol.tech;
+    server_name api.icassol.tech;
 
     location / {
         proxy_pass http://127.0.0.1:3000;
@@ -82,7 +82,7 @@ server {
 ```bash
 sudo ln -s /etc/nginx/sites-available/pintinhos /etc/nginx/sites-enabled/
 sudo nginx -t && sudo systemctl reload nginx
-sudo certbot --nginx -d icassol.tech -d www.icassol.tech   # HTTPS (opcional)
+sudo certbot --nginx -d api.icassol.tech   # HTTPS (opcional)
 ```
 
 Se for expor a porta 3000 direto, libere no firewall: `sudo ufw allow 3000/tcp`.

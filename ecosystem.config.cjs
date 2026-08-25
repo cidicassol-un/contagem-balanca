@@ -9,6 +9,10 @@ module.exports = {
       env: {
         NODE_ENV: 'production',
         PORT: 3000,
+        // 0.0.0.0 para que o proxy reverso (nginx em container Docker) alcance
+        // a aplicacao pelo gateway da rede. A porta 3000 deve permanecer
+        // fechada no firewall do host.
+        HOST: '0.0.0.0',
       },
     },
   ],
